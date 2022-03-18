@@ -1,0 +1,9 @@
+version: 1
+eventride:
+  url: http://localhost:8090/requests/immediate-ride
+eventschedule:
+  url: http://localhost:8090/requests/schedule-ride
+events:
+  hostname: sba.westus.cloudapp.azure.com
+  port: 9092
+  topic: events

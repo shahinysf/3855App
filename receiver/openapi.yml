@@ -1,0 +1,100 @@
+openapi: 3.0.0
+servers: []
+info:
+  description: This API allows for requests for ride and scheduling rides
+  version: "1.0.0"
+  title: Receiver API
+  contact:
+    email: syousefi1@my.bcit.ca
+tags:
+  - name: customers
+    description: operations available for customers to request
+
+
+paths:
+  /requests/immediate-ride:
+    post:
+      tags:
+        - customers
+      summary: receives a new request from the customer
+      operationId: app.immediate_ride
+      description: Adds an immediate ride from a customer to the system
+      responses:
+        '201':
+          description: item created
+        '400':
+          description: 'invalid input, object invalid'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RideRequest'
+        description: requested item to add
+
+  /requests/schedule-ride:
+    post:
+      tags:
+        - customers
+      summary: notifies a new scheduled request from the customers
+      operationId: app.scheduled_ride
+      description: Adds an scheduled ride from a customer to the system
+      responses:
+        '201':
+          description: item created
+        '400':
+          description: 'invalid input, object invalid'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleRequest'
+        description: requested item to add
+
+
+components:
+  schemas:
+
+    RideRequest:
+      type: object
+      required:
+        - customer_id
+        - distance
+        - price
+        - payment_method_id
+      properties:
+        customer_id:
+          type: string
+          format: uuid
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        distance:
+          type: number
+          example: 6.5
+        price:
+          type: number
+          example: 15.75
+        payment_method_id:
+          type: string
+          example: A12345
+
+    ScheduleRequest:
+      type: object
+      required:
+        - customer_id
+        - date_time
+        - distance
+        - price
+      properties:
+        customer_id:
+          type: string
+          format: uuid
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        date_time:
+          type: string
+          format: date-time
+          example: '2016-08-29T09:12:33.001Z'
+        distance:
+          type: number
+          example: 6.5
+        price:
+          type: number
+          example: 15.75

@@ -1,0 +1,116 @@
+import connexion
+import requests
+import yaml
+import json
+import datetime
+import logging
+import logging.config
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from base import Base
+from stats import Stats
+from apscheduler.schedulers.background import BackgroundScheduler
+
+with open('app_conf.yml', 'r') as f:
+    app_config = yaml.safe_load(f.read())
+
+with open('log_conf.yml', 'r') as f:
+    log_config = yaml.safe_load(f.read())
+    logging.config.dictConfig(log_config)
+logger = logging.getLogger('basicLogger')
+
+DB_ENGINE = create_engine("sqlite:///%s" % app_config["datastore"]["filename"])
+Base.metadata.bind = DB_ENGINE
+DB_SESSION = sessionmaker(bind=DB_ENGINE)
+
+
+def get_stats():
+
+    logger.info("Request Has Started.")
+    session = DB_SESSION()
+    stats = session.query(Stats).order_by(Stats.last_updated.desc()).first()
+    if stats:
+        stats = stats.to_dict()
+        logger.debug(".")
+    else:
+        session.close()
+        return {"message": "error"}, 400
+
+    session.close()
+    logger.debug(f'{stats}')
+    logger.info("Request Has Completed.")
+
+    return stats, 200
+
+
+def add_stat(stats):
+
+    session = DB_SESSION()
+    stt = Stats(stats['num_rr_readings'],
+                stats['max_dist'],
+                stats['max_price'],
+                stats['num_sr_readings'],
+                datetime.datetime.strptime(stats['last_updated'], "%Y-%m-%d %H:%M:%S"))
+    session.add(stt)
+    session.commit()
+    session.close()
+    logger.info('Database Updated')
+
+
+def populate_stats():
+    """ Periodically update stats """
+
+    logger.info("Periodic Processing Started.")
+    session = DB_SESSION()
+    stats = session.query(Stats).order_by(Stats.last_updated.desc()).first()
+    if stats:
+        stats = stats.to_dict()
+    else:
+        stats = {
+            'num_rr_readings': 0,
+            'max_dist': 0,
+            'max_price': 0,
+            'num_sr_readings': 0,
+            'last_updated': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+
+    rr_res = requests.get(app_config['eventstore1']['url'], params={'timestamp': stats['last_updated']})
+    sr_res = requests.get(app_config['eventstore2']['url'], params={'timestamp': stats['last_updated']})
+    rr_data = rr_res.json()
+    sr_data = sr_res.json()
+    print(rr_data)
+    print(sr_data)
+    num_events = len(rr_data) + len(sr_data)
+    if rr_res.status_code == 200 and sr_res.status_code == 200:
+        logger.info(f'There are {num_events} events received')
+        for event in rr_data:
+            event_id = event['trace_id']
+            logger.debug(f'Event_ID: {event_id}')
+            stats['num_rr_readings'] += 1
+            if event['distance'] > stats['max_dist']:
+                stats['max_dist'] = event['distance']
+            if event['price'] > stats['max_price']:
+                stats['max_price'] = event['price']
+        stats['num_sr_readings'] += stats['num_sr_readings'] + len(sr_data)
+        stats['last_updated'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+        add_stat(stats)
+        logger.debug(f'Stats Updated.')
+        logger.info("Periodic Processing Ended.")
+
+    else:
+        logger.error(f'Not A Successful Request')
+
+
+def init_scheduler():
+    sched = BackgroundScheduler(daemon=True)
+    sched.add_job(populate_stats, 'interval', seconds=app_config['scheduler']['period_sec'])
+    sched.start()
+
+
+app = connexion.FlaskApp(__name__, specification_dir='')
+app.add_api("./openapi.yml", strict_validation=True, validate_responses=True)
+
+if __name__ == "__main__":
+    init_scheduler()
+    app.run(port=8100, debug=True)

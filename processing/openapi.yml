@@ -1,0 +1,57 @@
+openapi: 3.0.0
+servers: []
+info:
+  description: This API is about processing
+  version: "1.0.0"
+  title: Processing API
+  contact:
+    email: syousefi1@my.bcit.ca
+
+paths:
+  /stats:
+    get:
+      summary: Gets the event stats
+      operationId: app.get_stats
+      description: Gets Ride Request and Schedule Request processsed statistics
+      responses:
+        '201':
+          description: Successfully returned a list of events
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/ReadingStats'
+        '400':
+          description: 'invalid request'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+components:
+  schemas:
+    ReadingStats:
+      type: object
+      required:
+        - num_rr_readings
+        - max_dist
+        - max_price
+        - num_sr_readings
+      properties:
+        num_rr_readings:
+          type: integer
+          example: 1000
+        tot_dist:
+          type: number
+          example: 200.0
+        tot_price:
+          type: number
+          example: 450.25
+        num_sr_readings:
+          type: integer
+          example: 500
+

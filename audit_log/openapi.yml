@@ -1,0 +1,136 @@
+openapi: 3.0.0
+info:
+  description: This API provides audit info
+  version: "1.0.0"
+  title: Audit API
+  contact:
+    email: syousefi1@my.bcit.ca
+
+paths:
+  /ride_request:
+    get:
+      summary: gets a ride request readings from history
+      operationId: app.get_ride_request_reading
+      description: Gets a ride request readings from the event store
+      parameters:
+        - name: index
+          in: query
+          description: Gets the RR at the index in the event store
+          schema:
+            type: integer
+            example: 100
+      responses:
+        '200':
+          description: Successfully returned a ride request event
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/RideRequest'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+  /schedule_request:
+    get:
+      summary: gets a schedule request readings from history
+      operationId: app.get_schedule_request_reading
+      description: Gets a schedule request readings from the event store
+      parameters:
+        - name: index
+          in: query
+          description: Gets the SR at the index in the event store
+          schema:
+            type: integer
+            example: 100
+      responses:
+        '200':
+          description: Successfully returned a schedule request event
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/ScheduleRequest'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+
+components:
+  schemas:
+    RideRequest:
+      type: object
+      required:
+        - customer_id
+        - distance
+        - price
+        - payment_method_id
+      properties:
+        customer_id:
+          type: string
+          format: uuid
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        distance:
+          type: number
+          example: 6.5
+        price:
+          type: number
+          example: 15.75
+        payment_method_id:
+          type: string
+          example: A12345
+
+    ScheduleRequest:
+      type: object
+      required:
+        - customer_id
+        - date_time
+        - distance
+        - price
+      properties:
+        customer_id:
+          type: string
+          format: uuid
+          example: d290f1ee-6c54-4b01-90e6-d701748f0851
+        date_time:
+          type: string
+          format: date-time
+          example: '2016-08-29 09:12:33'
+        distance:
+          type: number
+          example: 6.5
+        price:
+          type: number
+          example: 15.75

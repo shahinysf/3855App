@@ -27,7 +27,7 @@ def immediate_ride(body):
     producer = topic.get_sync_producer()
     msg = {"type": "eventride",
            "datetime":
-               datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+               datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
            "payload": body}
     msg_str = json.dumps(msg)
     producer.produce(msg_str.encode('utf-8'))
@@ -46,7 +46,7 @@ def scheduled_ride(body):
     producer = topic.get_sync_producer()
     msg = {"type": "eventschedule",
            "datetime":
-               datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+               datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%SZ"),
            "payload": body}
     msg_str = json.dumps(msg)
     producer.produce(msg_str.encode('utf-8'))

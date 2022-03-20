@@ -77,7 +77,7 @@ def get_ride_request_readings(timestamp):
     """Gets new ride request readings after the timestamp"""
 
     session = DB_SESSION()
-    timestamp_datetime = datetime.datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
+    timestamp_datetime = datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
     readings = session.query(RideRequest).filter(RideRequest.date_created >= timestamp_datetime)
     results_list = []
     for reading in readings:
@@ -93,7 +93,7 @@ def get_schedule_request_readings(timestamp):
     """Gets new schedule request readings after the timestamp"""
 
     session = DB_SESSION()
-    timestamp_datetime = datetime.datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
+    timestamp_datetime = datetime.datetime.strptime(timestamp, "%Y-%m-%dT%H:%M:%SZ")
     readings = session.query(ScheduleRequest).filter(ScheduleRequest.date_created >= timestamp_datetime)
     results_list = []
     for reading in readings:

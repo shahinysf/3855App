@@ -11,6 +11,7 @@ from base import Base
 from stats import Stats
 from apscheduler.schedulers.background import BackgroundScheduler
 
+
 with open('app_conf.yml', 'r') as f:
     app_config = yaml.safe_load(f.read())
 
@@ -50,7 +51,7 @@ def add_stat(stats):
                 stats['max_dist'],
                 stats['max_price'],
                 stats['num_sr_readings'],
-                datetime.datetime.strptime(stats['last_updated'], "%Y-%m-%d %H:%M:%S"))
+                datetime.datetime.strptime(stats['last_updated'], "%Y-%m-%dT%H:%M:%SZ"))
     session.add(stt)
     session.commit()
     session.close()
@@ -71,7 +72,7 @@ def populate_stats():
             'max_dist': 0,
             'max_price': 0,
             'num_sr_readings': 0,
-            'last_updated': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            'last_updated': datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         }
 
     rr_res = requests.get(app_config['eventstore1']['url'], params={'timestamp': stats['last_updated']})
@@ -92,7 +93,7 @@ def populate_stats():
             if event['price'] > stats['max_price']:
                 stats['max_price'] = event['price']
         stats['num_sr_readings'] += stats['num_sr_readings'] + len(sr_data)
-        stats['last_updated'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        stats['last_updated'] = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
 
         add_stat(stats)
         logger.debug(f'Stats Updated.')
@@ -103,7 +104,7 @@ def populate_stats():
 
 
 def init_scheduler():
-    sched = BackgroundScheduler(daemon=True)
+    sched = BackgroundScheduler(timezone='America/Vancouver', daemon=True)
     sched.add_job(populate_stats, 'interval', seconds=app_config['scheduler']['period_sec'])
     sched.start()
 

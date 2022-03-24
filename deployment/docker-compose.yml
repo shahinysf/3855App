@@ -58,12 +58,10 @@ services:
   processing:
     image: processing
     network_mode: 'host'
-    ports:
-      - "8100:8100"
     depends_on:
       - storage
   audit_log:
-    image: storage
+    image: audit_log
     ports:
       - "8110:8110"
     depends_on:

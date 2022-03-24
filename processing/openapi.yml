@@ -45,10 +45,10 @@ components:
         num_rr_readings:
           type: integer
           example: 1000
-        tot_dist:
+        max_dist:
           type: number
           example: 200.0
-        tot_price:
+        max_price:
           type: number
           example: 450.25
         num_sr_readings:

@@ -51,7 +51,7 @@ def add_stat(stats):
                 stats['max_dist'],
                 stats['max_price'],
                 stats['num_sr_readings'],
-                datetime.datetime.strptime(stats['last_updated'], "%Y-%m-%dT%H:%M:%SZ"))
+                datetime.datetime.strptime(stats['last_updated'], "%Y-%m-%d %H:%M:%S"))
     session.add(stt)
     session.commit()
     session.close()
@@ -72,7 +72,7 @@ def populate_stats():
             'max_dist': 0,
             'max_price': 0,
             'num_sr_readings': 0,
-            'last_updated': datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+            'last_updated': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         }
 
     rr_res = requests.get(app_config['eventstore1']['url'], params={'timestamp': stats['last_updated']})
@@ -93,7 +93,7 @@ def populate_stats():
             if event['price'] > stats['max_price']:
                 stats['max_price'] = event['price']
         stats['num_sr_readings'] += stats['num_sr_readings'] + len(sr_data)
-        stats['last_updated'] = datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+        stats['last_updated'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         add_stat(stats)
         logger.debug(f'Stats Updated.')

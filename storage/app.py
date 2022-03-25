@@ -29,7 +29,7 @@ host = app_config['datastore']['hostname']
 port = app_config['datastore']['port']
 db = app_config['datastore']['db']
 
-DB_ENGINE = create_engine(f'mysql+pymysql://{user}:{passwd}@{host}:{port}/{db}')
+DB_ENGINE = create_engine(f'mysql+pymysql://{user}:{passwd}@{host}:{port}/{db}, pool_size=20, max_overflow=0')
 
 
 Base.metadata.bind = DB_ENGINE

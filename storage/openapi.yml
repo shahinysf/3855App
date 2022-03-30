@@ -20,7 +20,14 @@ paths:
       operationId: app.get_ride_request_readings
       description: Gets ride request readings added after a timestamp
       parameters:
-        - name: timestamp
+        - name: start_timestamp
+          in: query
+          description: Limits the number of items on a page
+          schema:
+            type: string
+            format: date-time
+            example: '2016-08-29 09:12:33'
+        - name: end_timestamp
           in: query
           description: Limits the number of items on a page
           schema:
@@ -71,7 +78,14 @@ paths:
       operationId: app.get_schedule_request_readings
       description: Gets schedule request readings added after a timestamp
       parameters:
-        - name: timestamp
+        - name: start_timestamp
+          in: query
+          description: Limits the number of items on a page
+          schema:
+            type: string
+            format: date-time
+            example: '2016-08-29 09:12:33'
+        - name: end_timestamp
           in: query
           description: Limits the number of items on a page
           schema:

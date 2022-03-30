@@ -76,8 +76,8 @@ def populate_stats():
             'last_updated': datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         }
 
-    rr_res = requests.get(app_config['eventstore1']['url'], params={'timestamp': stats['last_updated']})
-    sr_res = requests.get(app_config['eventstore2']['url'], params={'timestamp': stats['last_updated']})
+    rr_res = requests.get(app_config['eventstore1']['url'] + "?start_timestamp="+ stats['last_updated'] + "&end_timestamp="+datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
+    sr_res = requests.get(app_config['eventstore2']['url'] + "?start_timestamp="+ stats['last_updated'] + "&end_timestamp="+datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')})
     rr_data = rr_res.json()
     sr_data = sr_res.json()
     print(rr_data)

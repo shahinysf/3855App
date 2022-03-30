@@ -2,6 +2,7 @@ import connexion
 from connexion import NoContent
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy import and_
 from base import Base
 from ride_request import RideRequest
 from schedule_request import ScheduleRequest
@@ -72,13 +73,15 @@ def scheduled_ride(body):
     return NoContent, 201
 
 
-def get_ride_request_readings(timestamp):
+def get_ride_request_readings(start_timestamp, end_timestamp):
 
     """Gets new ride request readings after the timestamp"""
 
     session = DB_SESSION()
-    timestamp_datetime = datetime.datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
-    readings = session.query(RideRequest).filter(RideRequest.date_created >= timestamp_datetime)
+    start_timestamp_datetime = datetime.datetime.strptime(start_timestamp, "%Y-%m-%d %H:%M:%S")
+    end_timestamp_datetime = datetime.datetime.strptime(end_timestamp, "%Y-%m-%d %H:%M:%S")
+    readings = session.query(RideRequest).filter(and_(RideRequest.date_created >= start_timestamp_datetime, 
+                                                RideRequest.date_created < end_timestamp_datetime))
     results_list = []
     for reading in readings:
         results_list.append(reading.to_dict())
@@ -93,8 +96,10 @@ def get_schedule_request_readings(timestamp):
     """Gets new schedule request readings after the timestamp"""
 
     session = DB_SESSION()
-    timestamp_datetime = datetime.datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S")
-    readings = session.query(ScheduleRequest).filter(ScheduleRequest.date_created >= timestamp_datetime)
+    start_timestamp_datetime = datetime.datetime.strptime(start_timestamp, "%Y-%m-%d %H:%M:%S")
+    end_timestamp_datetime = datetime.datetime.strptime(end_timestamp, "%Y-%m-%d %H:%M:%S")
+    readings = session.query(ScheduleRequest).filter(and_(ScheduleRequest.date_created >= start_timestamp_datetime,
+                                                         ScheduleRequest.date_created < end_timestamp_datetime)
     results_list = []
     for reading in readings:
         results_list.append(reading.to_dict())

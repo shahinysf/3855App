@@ -112,9 +112,6 @@ def get_schedule_request_readings(timestamp):
 def process_messages():
     """ Process event messages """
 
-    # client = KafkaClient(hosts='{}:{}'.format(app_config['events']['hostname'], app_config['events']['port']))
-    # topic = client.topics[str.encode(app_config["events"]["topic"])]
-
     client = KafkaClient(hosts='{}:{}'.format(app_config['events']['hostname'], app_config['events']['port']))
     topic = client.topics[str.encode(app_config["events"]["topic"])]
 

@@ -91,7 +91,7 @@ def get_ride_request_readings(start_timestamp, end_timestamp):
     return results_list, 200
 
 
-def get_schedule_request_readings(timestamp):
+def get_schedule_request_readings(start_timestamp, end_timestamp):
 
     """Gets new schedule request readings after the timestamp"""
 

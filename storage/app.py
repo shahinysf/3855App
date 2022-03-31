@@ -111,9 +111,18 @@ def get_schedule_request_readings(timestamp):
 
 def process_messages():
     """ Process event messages """
-
-    client = KafkaClient(hosts='{}:{}'.format(app_config['events']['hostname'], app_config['events']['port']))
-    topic = client.topics[str.encode(app_config["events"]["topic"])]
+    max_retry = app_config['connection']['maxretry']
+    current_retry = 0
+    while current_retry <= max_retry:
+        logger.info("Trying to connect to kafka. Retry number %s" % current_retry)
+        try:
+            client = KafkaClient(hosts='{}:{}'.format(app_config['events']['hostname'], app_config['events']['port']))
+            topic = client.topics[str.encode(app_config["events"]["topic"])]
+            break
+        except:
+            logger.error(f'Connection Failed!')
+            time.sleep(app_config['sleep']['time'])
+            current_retry += 1
 
     # Create a "consume" on a consumer group, that only reads new messages
     # (uncommitted messages) when the service re-starts (i.e., it doesn't

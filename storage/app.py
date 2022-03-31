@@ -99,7 +99,7 @@ def get_schedule_request_readings(timestamp):
     start_timestamp_datetime = datetime.datetime.strptime(start_timestamp, "%Y-%m-%d %H:%M:%S")
     end_timestamp_datetime = datetime.datetime.strptime(end_timestamp, "%Y-%m-%d %H:%M:%S")
     readings = session.query(ScheduleRequest).filter(and_(ScheduleRequest.date_created >= start_timestamp_datetime,
-                                                         ScheduleRequest.date_created < end_timestamp_datetime)
+                                                         ScheduleRequest.date_created < end_timestamp_datetime))
     results_list = []
     for reading in readings:
         results_list.append(reading.to_dict())

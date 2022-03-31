@@ -8,6 +8,7 @@ import logging.config
 import uuid
 import datetime
 from pykafka import KafkaClient
+import time
 
 with open('app_conf.yml', 'r') as f:
     app_config = yaml.safe_load(f.read())
@@ -18,18 +19,29 @@ with open('log_conf.yml', 'r') as f:
 
 logger = logging.getLogger('basicLogger')
 
+max_retry = app_config['connection']['maxretry']
+current_retry = 0
+while current_retry <= max_retry:
+    logger.info("Trying to connect to kafka. Retry number %s" % current_retry)
+    try:
+        client = KafkaClient(hosts='{}:{}'.format(app_config['events']['hostname'], app_config['events']['port']))
+        topic = client.topics[str.encode(app_config['events']['topic'])]
+        break
+    except:
+        logger.error(f'Connection Failed!')
+        time.sleep(app_config['sleep']['time'])
+        current_retry += 1
+
 
 def immediate_ride(body):
     body["trace_id"] = str(uuid.uuid4())
 
-    client = KafkaClient(hosts='{}:{}'.format(app_config['events']['hostname'], app_config['events']['port']))
-    topic = client.topics[str.encode(app_config['events']['topic'])]
-    producer = topic.get_sync_producer()
     msg = {"type": "eventride",
            "datetime":
-               datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+               datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S "),
            "payload": body}
     msg_str = json.dumps(msg)
+    producer = topic.get_sync_producer()
     producer.produce(msg_str.encode('utf-8'))
 
     logger.info('Received event Ride with a trace id of %s ', body["trace_id"])
@@ -41,14 +53,12 @@ def immediate_ride(body):
 def scheduled_ride(body):
     body["trace_id"] = str(uuid.uuid4())
 
-    client = KafkaClient(hosts='{}:{}'.format(app_config['events']['hostname'], app_config['events']['port']))
-    topic = client.topics[str.encode(app_config['events']['topic'])]
-    producer = topic.get_sync_producer()
     msg = {"type": "eventschedule",
            "datetime":
                datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
            "payload": body}
     msg_str = json.dumps(msg)
+    producer = topic.get_sync_producer()
     producer.produce(msg_str.encode('utf-8'))
 
     logger.info('Received event Ride with a trace id of %s ', body["trace_id"])

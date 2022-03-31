@@ -9,3 +9,7 @@ events:
   hostname: sba.westus.cloudapp.azure.com
   port: 9092
   topic: events
+connection:
+  maxretry: 5
+sleep:
+  time: 1

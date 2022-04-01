@@ -87,7 +87,7 @@ def get_ride_request_readings(start_timestamp, end_timestamp):
         results_list.append(reading.to_dict())
         session.close()
         logger.info("Query for Ride Request readings after %s returns %d results" %
-                    (timestamp, len(results_list)))
+                    (start_timestamp, len(results_list)))
     return results_list, 200
 
 
@@ -105,7 +105,7 @@ def get_schedule_request_readings(start_timestamp, end_timestamp):
         results_list.append(reading.to_dict())
         session.close()
         logger.info("Query for Schedule Request readings after %s returns %d results" %
-                    (timestamp, len(results_list)))
+                    (start_timestamp, len(results_list)))
     return results_list, 200
 
 

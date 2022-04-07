@@ -21,7 +21,8 @@ else:
 
 with open('app_conf.yml', 'r') as f:
     app_config = yaml.safe_load(f.read())
-
+    
+# External Logging Configuration
 with open('log_conf.yml', 'r') as f:
     log_config = yaml.safe_load(f.read())
     logging.config.dictConfig(log_config)

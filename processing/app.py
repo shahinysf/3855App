@@ -38,11 +38,26 @@ path = '/data'
 isExist = os.path.exists(path)
 if not isExist:
     os.makedirs(path)
-    exec(open("create_tables.py").read())
+    create_table()
 
 DB_ENGINE = create_engine("sqlite:///%s" % app_config["datastore"]["filename"])
 Base.metadata.bind = DB_ENGINE
 DB_SESSION = sessionmaker(bind=DB_ENGINE)
+
+def create_table():
+    conn = sqlite3.connect('/data/data.sqlite')
+    c = conn.cursor()
+    c.execute(''' 
+              CREATE TABLE stats 
+              (id INTEGER PRIMARY KEY ASC, 
+              num_rr_readings INTEGER NOT NULL, 
+              max_dist INTEGER NOT NULL, 
+              max_price INTEGER NOT NULL, 
+              num_sr_readings INTEGER NOT NULL, 
+              last_updated VARCHAR(100) NOT NULL) 
+              ''')
+    conn.commit()
+    conn.close()
 
 
 def get_stats():

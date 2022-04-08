@@ -5,6 +5,7 @@ import json
 import datetime
 import logging
 import logging.config
+import sqlite3
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from base import Base

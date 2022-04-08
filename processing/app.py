@@ -34,6 +34,13 @@ logger = logging.getLogger('basicLogger')
 logger.info("App Conf File: %s" % app_conf_file) 
 logger.info("Log Conf File: %s" % log_conf_file)
 
+path = '/data'
+isExist = os.path.exists(path)
+if not isExist:
+    os.makedirs(path)
+    print("A new directory created!")
+    exec(open("create_tables.py").read())
+
 DB_ENGINE = create_engine("sqlite:///%s" % app_config["datastore"]["filename"])
 Base.metadata.bind = DB_ENGINE
 DB_SESSION = sessionmaker(bind=DB_ENGINE)

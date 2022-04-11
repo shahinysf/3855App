@@ -76,7 +76,7 @@ services:
       - kafka
   processing:
     image: processing
-    port:
+    ports:
       - "8100"
     networks:
       - "api.network"
@@ -85,7 +85,6 @@ services:
     volumes:
       - /home/azureuser/config/processing:/config
       - /home/azureuser/config/logs:/logs
-      - processing-db:/data
     depends_on:
       - storage
   audit_log:
@@ -121,16 +120,15 @@ services:
       - "storage"
       - "processing"
       - "audit_log"
-      - "dashboard-ui"
+      - "dashboard"
     # Connects the port 80 of the nginx container to localhost:80 or localhost
     ports:
       - "80:80"
     networks:
       - "api.network"
-      
+
 # Names our volume
 volumes:
   my-db:
-  processing-db:
 networks:
   api.network:
